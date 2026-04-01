@@ -14,7 +14,7 @@ CNumber& CNumber::operator=(const int iValue)
         b_isNegative = false;
     }
 
-    //sprawdzenie długości tablicy:
+    //check table length
     int i_value_length = 0;
     int i_value_copy = i_value;
 
@@ -26,25 +26,20 @@ CNumber& CNumber::operator=(const int iValue)
         i_value_copy /= i_base;
     }
 
-    int* pi_number_copy = new int[i_value_length];
+    int* pi_number_new = new int[i_value_length];
 
     int j = 0;
 
     while (i_value > 0) {
-        pi_number_copy[j] = i_value % i_base;
+        pi_number_new[j] = i_value % i_base;
         i_value /= i_base;
         j++;
     }
 
-    if (pi_number_copy != nullptr) {
-        delete[] pi_number;
-        pi_number = pi_number_copy;
-        i_length = i_value_length;
-    }
-    else {
-        b_wasLastOperationSuccessful = false;
-    }
 
+    delete[] pi_number;
+    pi_number = pi_number_new;
+    i_length = i_value_length;
     b_wasLastOperationSuccessful = true;
 
     return *this;
