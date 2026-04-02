@@ -4,48 +4,46 @@ CNumber::CNumber(const CNumber &pcOther) {
     pi_number = NULL;
     *this = pcOther; //deep copy
 }
+CNumber::CNumber(int iBase) {
+    i_length = NUMBER_DEFAULT_LENGTH;
+    pi_number = new int[i_length];
+    i_base = iBase;
+    pi_number[0] = 0;
+    b_isNegative = false;
+    b_wasLastOperationSuccessful = true;
+}
 
-CNumber& CNumber::operator=(const int iValue)
-{
-    int i_value = iValue;
-    if (iValue < 0)
-    {
-        b_isNegative = true;
-        i_value *= -1;
+CNumber::CNumber() {
+    i_length = NUMBER_DEFAULT_LENGTH;
+    pi_number = new int[i_length];
+    i_base = DEFAULT_BASE;
+    pi_number[0] = 0;
+    b_isNegative = false;
+    b_wasLastOperationSuccessful = true;
+};
+
+CNumber& CNumber::operator=(const int iValue) {
+    int i_value = abs(iValue);
+    b_isNegative = (iValue < 0);
+
+    int i_temp = i_value;
+    int i_len = 0;
+    do {
+        i_len++;
+        i_temp /= i_base;
+    } while (i_temp > 0);
+
+    int* pi_new = new int[i_len];
+
+    i_temp = i_value;
+    for (int i = 0; i < i_len; i++) {
+        pi_new[i] = i_temp % i_base;
+        i_temp /= i_base;
     }
-    else
-    {
-        b_isNegative = false;
-    }
-
-    //check table length
-    int i_value_length = 0;
-    int i_value_copy = i_value;
-
-    if (i_value_copy == 0) {
-        i_value_length = 1;
-    }
-    while (i_value_copy > 0) {
-        i_value_length++;
-        i_value_copy /= i_base;
-    }
-
-    int* pi_number_new = new int[i_value_length];
-
-    int j = 0;
-
-    while (i_value > 0) {
-        pi_number_new[j] = i_value % i_base;
-        i_value /= i_base;
-        j++;
-    }
-
 
     delete[] pi_number;
-    pi_number = pi_number_new;
-    i_length = i_value_length;
-    b_wasLastOperationSuccessful = true;
-
+    pi_number = pi_new;
+    i_length = i_len;
     return *this;
 }
 
@@ -72,11 +70,20 @@ CNumber& CNumber::operator=(const CNumber &pcOther)
 }
 
 CNumber CNumber::operator+(CNumber &pcOther) {
+
+    if (this->i_base != pcOther.i_base) {
+        CNumber c_other_copy = pcOther;
+        c_other_copy.vChangeBase(this->i_base);
+        return (*this + c_other_copy);
+    }
+
     CNumber c_res;
+    c_res.i_base = this->i_base;
+
     if (this->b_isNegative == pcOther.b_isNegative) {
         c_res.b_isNegative = this->b_isNegative;
     }
-    //jesli znaki rozne to traktujemy to jako dodawanie, ale jeszcze nie mam zaimplementowanego
+    //jesli znaki rozne to traktujemy to jako odejmowanie, ale jeszcze nie mam zaimplementowanego
 
     int i_max_len;
     if (i_length > pcOther.i_length) {
@@ -118,6 +125,69 @@ CNumber CNumber::operator+(int iNewVal) {
     return (*this + c_temp);
 }
 
+CNumber CNumber::operator*(int iMult) {
+    CNumber c_res;
+    if (iMult == 0) {
+        c_res = 0;
+        return c_res;
+    }
+
+    int i_absMult = abs(iMult);
+    c_res.i_base = this->i_base;
+
+    //iMult length check
+    int iMultLength = 0;
+    int iMultCopy = i_absMult;
+    while (iMultCopy > 0) {
+        iMultLength++;
+        iMultCopy /= i_base;
+    }
+
+    int i_newLength = i_length + iMultLength;
+    int* pi_new_table = new int[i_newLength + 1]; //potencjalne przeniesienie
+    int i_carry = 0;
+
+    for (int i = 0; i < i_length; i++) {
+        int i_prod = pi_number[i] * i_absMult + i_carry;
+        pi_new_table[i] = (i_prod % i_base);
+        i_carry = (i_prod / i_base);
+    }
+
+    int i_currentPos = i_length;
+    while (i_carry > 0) {
+        pi_new_table[i_currentPos] = i_carry % i_base;
+        i_carry /= i_base;
+        i_currentPos++;
+    }
+
+    delete[] c_res.pi_number;
+
+    c_res.i_length = i_currentPos;
+    c_res.pi_number = pi_new_table;
+    c_res.b_isNegative = (this->b_isNegative != (iMult < 0));
+    c_res.b_wasLastOperationSuccessful = true;
+
+    return c_res;
+}
+
+void CNumber::vChangeBase(int iNewBase) {
+    if (i_base == iNewBase) return;
+
+    CNumber c_new_val;
+    c_new_val.i_base = iNewBase;
+    c_new_val = 0;
+
+    //algorytm Hornera
+    for (int i = i_length - 1; i >= 0; i--) {
+        CNumber c_temp_mult = c_new_val * i_base;
+        c_new_val = c_temp_mult + pi_number[i];
+    }
+
+    c_new_val.b_isNegative = this->b_isNegative;
+    *this = c_new_val;
+    this->i_base = iNewBase;
+}
+
 std::string CNumber::sToString() {
     std::string s_number = "";
     if (b_isNegative) {
@@ -126,5 +196,6 @@ std::string CNumber::sToString() {
     for (int i = i_length - 1; i >= 0; i--) {
         s_number += std::to_string(pi_number[i]);
     }
-    return s_number;
+    return s_number + "(base: " + std::to_string(i_base) + ")";
 }
+;

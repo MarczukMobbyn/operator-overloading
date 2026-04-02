@@ -1,16 +1,16 @@
 #ifndef LISTA2_CNUMBER_H
 #define LISTA2_CNUMBER_H
-#define NUMBER_DEFAULT_LENGTH 10
+#define NUMBER_DEFAULT_LENGTH 1
 #define DEFAULT_BASE 10
 #include <string>
 
 class CNumber
 {
 public:
-    CNumber() {i_length = NUMBER_DEFAULT_LENGTH; pi_number = new
-   int[i_length]; i_base = DEFAULT_BASE; b_isNegative = false;b_wasLastOperationSuccessful = true;};
+    CNumber();
     ~CNumber() {delete[] pi_number;}
     CNumber(const CNumber &pcOther);
+    CNumber(int iBase);
 
     CNumber& operator=(const CNumber &pcNewVal);
     CNumber& operator=(const int iValue);
@@ -25,6 +25,7 @@ public:
     bool bIsNegative() {return b_isNegative;}
     bool bWasLastOperationSuccessful() {return b_wasLastOperationSuccessful;}
     std::string sToString();
+    void vChangeBase(int iNewBase);
 private:
     int *pi_number; //liczby przechowywane w odwrotnej kolejnosci dla uproszczenia dzialan np dzielenia
     int i_length;
