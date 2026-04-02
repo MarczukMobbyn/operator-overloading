@@ -1,5 +1,9 @@
 #include "CNumber.h"
 
+CNumber::CNumber(const CNumber &pcOther) {
+    pi_number = NULL;
+    *this = pcOther; //deep copy
+}
 
 CNumber& CNumber::operator=(const int iValue)
 {
@@ -67,8 +71,54 @@ CNumber& CNumber::operator=(const CNumber &pcOther)
     return *this;
 }
 
+CNumber CNumber::operator+(CNumber &pcOther) {
+    CNumber c_res;
+    if (this->b_isNegative == pcOther.b_isNegative) {
+        c_res.b_isNegative = this->b_isNegative;
+    }
+    //jesli znaki rozne to traktujemy to jako dodawanie, ale jeszcze nie mam zaimplementowanego
 
-std::string CNumber::toString() {
+    int i_max_len;
+    if (i_length > pcOther.i_length) {
+        i_max_len = i_length;
+    } else {
+        i_max_len = pcOther.i_length;
+    }
+    int* pi_new_table = new int[i_max_len + 1];
+
+    int i_carry = 0;
+    int i_sum = 0;
+
+    for (int i = 0; i < i_max_len; i++) {
+        int i_d1 = (i < i_length) ? pi_number[i] : 0;
+        int i_d2 = (i < pcOther.i_length) ? pcOther.pi_number[i] : 0;
+
+        i_sum = i_d1 + i_d2 + i_carry;
+        pi_new_table[i] = i_sum % i_base;
+        i_carry = i_sum / i_base;
+    }
+
+    int i_final_len = i_max_len;
+    if (i_carry > 0) {
+        pi_new_table[i_final_len] = i_carry;
+        i_final_len++;
+    }
+
+    delete[] c_res.pi_number;
+    c_res.pi_number = pi_new_table;
+    c_res.i_length = i_final_len;
+
+    return c_res;
+}
+
+CNumber CNumber::operator+(int iNewVal) {
+    CNumber c_temp;
+    c_temp = iNewVal;
+
+    return (*this + c_temp);
+}
+
+std::string CNumber::sToString() {
     std::string s_number = "";
     if (b_isNegative) {
         s_number += "-";

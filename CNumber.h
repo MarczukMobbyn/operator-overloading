@@ -10,6 +10,7 @@ public:
     CNumber() {i_length = NUMBER_DEFAULT_LENGTH; pi_number = new
    int[i_length]; i_base = DEFAULT_BASE; b_isNegative = false;b_wasLastOperationSuccessful = true;};
     ~CNumber() {delete[] pi_number;}
+    CNumber(const CNumber &pcOther);
 
     CNumber& operator=(const CNumber &pcNewVal);
     CNumber& operator=(const int iValue);
@@ -23,7 +24,7 @@ public:
     CNumber operator/(int iNewVal);
     bool bIsNegative() {return b_isNegative;}
     bool bWasLastOperationSuccessful() {return b_wasLastOperationSuccessful;}
-    std::string toString();
+    std::string sToString();
 private:
     int *pi_number; //liczby przechowywane w odwrotnej kolejnosci dla uproszczenia dzialan np dzielenia
     int i_length;
