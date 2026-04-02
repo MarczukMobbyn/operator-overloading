@@ -45,6 +45,29 @@ CNumber& CNumber::operator=(const int iValue)
     return *this;
 }
 
+CNumber& CNumber::operator=(const CNumber &pcOther)
+{
+    if (this == &pcOther) {
+        return *this;
+    }
+
+    int i_new_length = pcOther.i_length;
+    int* pi_number_new = new int[i_new_length];
+    for (int i = 0; i < i_new_length; i++) {
+        pi_number_new[i] = pcOther.pi_number[i];
+    }
+
+    i_length = i_new_length;
+    b_isNegative = pcOther.b_isNegative;
+    i_base = pcOther.i_base;
+    b_wasLastOperationSuccessful = pcOther.b_wasLastOperationSuccessful;
+
+    delete[] pi_number;
+    pi_number = pi_number_new;
+    return *this;
+}
+
+
 std::string CNumber::toString() {
     std::string s_number = "";
     if (b_isNegative) {
