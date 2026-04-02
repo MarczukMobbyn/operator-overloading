@@ -8,7 +8,7 @@ class CNumber
 {
 public:
     CNumber() {i_length = NUMBER_DEFAULT_LENGTH; pi_number = new
-   int[i_length]; i_base = DEFAULT_BASE; b_isNegative = false;};
+   int[i_length]; i_base = DEFAULT_BASE; b_isNegative = false;b_wasLastOperationSuccessful = true;};
     ~CNumber() {delete[] pi_number;}
 
     CNumber& operator=(const CNumber &pcNewVal);
