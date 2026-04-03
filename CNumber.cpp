@@ -320,6 +320,109 @@ CNumber CNumber::operator*(CNumber &pcOther) {
     return c_res;
 }
 
+CNumber CNumber::operator/(CNumber &pcOther) {
+    //dzielenie przez zero
+    if (pcOther.i_length == 1 && pcOther.pi_number[0] == 0) {
+        CNumber c_err;
+        c_err.b_wasLastOperationSuccessful = false;
+        return c_err;
+    }
+
+    //konwersja bazy
+    if (this->i_base != pcOther.i_base) {
+        CNumber c_other_copy = pcOther;
+        c_other_copy.vChangeBase(this->i_base);
+        return (*this / c_other_copy);
+    }
+
+    //pobranie wartości bezwzględnych
+    CNumber c_dividend_abs = *this;
+    c_dividend_abs.b_isNegative = false;
+    CNumber c_divisor_abs = pcOther;
+    c_divisor_abs.b_isNegative = false;
+
+    if (!c_dividend_abs.bIsGreaterOrEqual(c_divisor_abs)) {
+        CNumber c_zero(this->i_base);
+        c_zero = 0;
+        return c_zero;
+    }
+
+    CNumber c_res;
+    c_res.i_base = this->i_base;
+    int* pi_quot_table = new int[this->i_length];
+
+    CNumber c_current_rem(this->i_base);
+    c_current_rem = 0;
+
+    //algorytm na dzielenie pisemne (fuj, ale dziala)
+    for (int i = i_length - 1; i >= 0; i--) {
+        c_current_rem = (c_current_rem * i_base) + pi_number[i];
+
+        int i_q = 0; //ile razy dzielnik miesci sie w aktualnej reszcie
+
+        while (c_current_rem.bIsGreaterOrEqual(c_divisor_abs)) {
+            c_current_rem = c_current_rem - c_divisor_abs;
+            i_q++;
+        }
+        pi_quot_table[i] = i_q;
+    }
+
+    int i_final_len = i_length;
+    while (i_final_len > 1 && pi_quot_table[i_final_len - 1] == 0) {
+        i_final_len--;
+    }
+
+    delete[] c_res.pi_number;
+    c_res.pi_number = pi_quot_table;
+    c_res.i_length = i_final_len;
+    c_res.b_isNegative = (this->b_isNegative != pcOther.b_isNegative);
+
+    if (c_res.i_length == 1 && c_res.pi_number[0] == 0) {
+        c_res.b_isNegative = false;
+    }
+
+    return c_res;
+}
+
+CNumber CNumber::operator/(int iNewVal) {
+    if (iNewVal == 0) {
+        CNumber c_err;
+        c_err.b_wasLastOperationSuccessful = false;
+        return c_err;
+    }
+
+    CNumber c_res;
+    c_res.i_base = this->i_base;
+    int i_absDiv = abs(iNewVal);
+
+    int* pi_quot_table = new int[i_length];
+    long long l_rem = 0;
+
+    for (int i = i_length - 1; i >= 0; i--) {
+        long long l_current = l_rem * i_base + pi_number[i];
+
+        pi_quot_table[i] = (int)(l_current / i_absDiv);
+        l_rem = l_current % i_absDiv;
+    }
+
+    int i_final_len = i_length;
+    while (i_final_len > 1 && pi_quot_table[i_final_len - 1] == 0) {
+        i_final_len--;
+    }
+
+    delete[] c_res.pi_number;
+    c_res.pi_number = pi_quot_table;
+    c_res.i_length = i_final_len;
+
+    c_res.b_isNegative = (this->b_isNegative != (iNewVal < 0));
+
+    if (c_res.i_length == 1 && c_res.pi_number[0] == 0) {
+        c_res.b_isNegative = false;
+    }
+
+    return c_res;
+}
+
 bool CNumber::bIsGreaterOrEqual(CNumber &pcOther) {
     if (this->i_length > pcOther.i_length) {
         return true;
@@ -363,6 +466,12 @@ std::string CNumber::sToString() {
     for (int i = i_length - 1; i >= 0; i--) {
         s_number += std::to_string(pi_number[i]);
     }
-    return s_number + "(base: " + std::to_string(i_base) + ")";
+    if (bWasLastOperationSuccessful()) {
+        return s_number + "(base: " + std::to_string(i_base) + ")";
+    }
+    else {
+        return "Error";
+    }
+
 }
 ;
