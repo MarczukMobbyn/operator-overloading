@@ -83,7 +83,18 @@ CNumber CNumber::operator+(CNumber &pcOther) {
     if (this->b_isNegative == pcOther.b_isNegative) {
         c_res.b_isNegative = this->b_isNegative;
     }
-    //jesli znaki rozne to traktujemy to jako odejmowanie, ale jeszcze nie mam zaimplementowanego
+    else if (this->bIsNegative()) {
+        CNumber c_temp;
+        c_temp = *this;
+        c_temp.b_isNegative = false;
+        return (pcOther - c_temp);
+    }
+    else {
+        CNumber c_temp;
+        c_temp = pcOther;
+        c_temp.b_isNegative = false;
+        return (*this - c_temp);
+    }
 
     int i_max_len;
     if (i_length > pcOther.i_length) {
