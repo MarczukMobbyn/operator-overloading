@@ -23,7 +23,6 @@ public:
     CNumber operator-(int iNewVal);
     CNumber operator/(int iNewVal);
     bool bIsNegative() {return b_isNegative;}
-    bool bWasLastOperationSuccessful() {return b_wasLastOperationSuccessful;}
     std::string sToString();
     void vChangeBase(int iNewBase);
     bool bIsGreaterOrEqual(CNumber &pcOther);
@@ -32,6 +31,5 @@ private:
     int i_length;
     bool b_isNegative;
     int i_base;
-    bool b_wasLastOperationSuccessful;
 };
 #endif //LISTA2_CNUMBER_H

@@ -5,4 +5,5 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Lista2 main.cpp
         CNumber.h
-        CNumber.cpp)
+        CNumber.cpp
+        DividedByZeroException.h)

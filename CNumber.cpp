@@ -1,5 +1,7 @@
 #include "CNumber.h"
 
+#include "DividedByZeroException.h"
+
 CNumber::CNumber(const CNumber &pcOther) {
     pi_number = NULL;
     *this = pcOther; //deep copy
@@ -10,7 +12,7 @@ CNumber::CNumber(int iBase) {
     i_base = iBase;
     pi_number[0] = 0;
     b_isNegative = false;
-    b_wasLastOperationSuccessful = true;
+
 }
 
 CNumber::CNumber() {
@@ -19,7 +21,6 @@ CNumber::CNumber() {
     i_base = DEFAULT_BASE;
     pi_number[0] = 0;
     b_isNegative = false;
-    b_wasLastOperationSuccessful = true;
 };
 
 CNumber& CNumber::operator=(const int iValue) {
@@ -62,7 +63,6 @@ CNumber& CNumber::operator=(const CNumber &pcOther)
     i_length = i_new_length;
     b_isNegative = pcOther.b_isNegative;
     i_base = pcOther.i_base;
-    b_wasLastOperationSuccessful = pcOther.b_wasLastOperationSuccessful;
 
     delete[] pi_number;
     pi_number = pi_number_new;
@@ -262,7 +262,6 @@ CNumber CNumber::operator*(int iMult) {
     c_res.i_length = i_currentPos;
     c_res.pi_number = pi_new_table;
     c_res.b_isNegative = (this->b_isNegative != (iMult < 0));
-    c_res.b_wasLastOperationSuccessful = true;
 
     return c_res;
 }
@@ -323,9 +322,7 @@ CNumber CNumber::operator*(CNumber &pcOther) {
 CNumber CNumber::operator/(CNumber &pcOther) {
     //dzielenie przez zero
     if (pcOther.i_length == 1 && pcOther.pi_number[0] == 0) {
-        CNumber c_err;
-        c_err.b_wasLastOperationSuccessful = false;
-        return c_err;
+        throw DividedByZeroException();
     }
 
     //konwersja bazy
@@ -386,9 +383,7 @@ CNumber CNumber::operator/(CNumber &pcOther) {
 
 CNumber CNumber::operator/(int iNewVal) {
     if (iNewVal == 0) {
-        CNumber c_err;
-        c_err.b_wasLastOperationSuccessful = false;
-        return c_err;
+        throw DividedByZeroException();
     }
 
     CNumber c_res;
@@ -466,12 +461,6 @@ std::string CNumber::sToString() {
     for (int i = i_length - 1; i >= 0; i--) {
         s_number += std::to_string(pi_number[i]);
     }
-    if (bWasLastOperationSuccessful()) {
-        return s_number + "(base: " + std::to_string(i_base) + ")";
-    }
-    else {
-        return "Error";
-    }
-
+    return s_number + "(base: " + std::to_string(i_base) + ")";
 }
 ;
