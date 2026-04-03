@@ -26,6 +26,7 @@ public:
     bool bWasLastOperationSuccessful() {return b_wasLastOperationSuccessful;}
     std::string sToString();
     void vChangeBase(int iNewBase);
+    bool bIsGreaterOrEqual(CNumber &pcOther);
 private:
     int *pi_number; //liczby przechowywane w odwrotnej kolejnosci dla uproszczenia dzialan np dzielenia
     int i_length;

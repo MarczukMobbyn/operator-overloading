@@ -125,6 +125,92 @@ CNumber CNumber::operator+(int iNewVal) {
     return (*this + c_temp);
 }
 
+CNumber CNumber::operator-(CNumber &pcOther) {
+    if (this->i_base != pcOther.i_base) {
+        CNumber c_other_copy;
+        c_other_copy = pcOther;
+        c_other_copy.vChangeBase(this->i_base);
+        return (*this - c_other_copy);
+    }
+
+    // a - (-b) = a + b
+    if (!this->bIsNegative() && pcOther.bIsNegative()) {
+        CNumber c_temp;
+        c_temp = pcOther;
+        c_temp.b_isNegative = false;
+        return (*this + c_temp);
+    }
+    // -a - b = -(a + b)
+    else if (this->bIsNegative() && !pcOther.bIsNegative()) {
+        CNumber c_temp;
+        c_temp = *this;
+        c_temp.b_isNegative = false;
+        CNumber c_res;
+        c_res = (c_temp + pcOther);
+        c_res.b_isNegative = true;
+        return (c_res);
+    } // -a - (-b) = b - a
+    else if (this->bIsNegative() && pcOther.bIsNegative()) {
+        CNumber c_temp1, c_temp2;
+        c_temp1 = *this;
+        c_temp2 = pcOther;
+        c_temp1.b_isNegative = false;
+        c_temp2.b_isNegative = false;
+        return (c_temp2 - c_temp1);
+    }
+
+    CNumber *pc_big = this;
+    CNumber *pc_small = &pcOther;
+    bool b_final_negative = false;
+
+    if (!this->bIsGreaterOrEqual(pcOther)) {
+        pc_big = &pcOther;
+        pc_small = this;
+        b_final_negative = true;
+    }
+
+    CNumber c_res;
+    c_res.i_base = this->i_base;
+
+    int* pi_new_table = new int[i_length];
+    int i_borrow = 0;
+
+    for (int i = 0; i < pc_big->i_length; i++) {
+        int i_d1 = pc_big->pi_number[i];
+        int i_d2 = (i < pc_small->i_length) ? pc_small->pi_number[i] : 0;
+
+        int i_diff = i_d1 - i_d2 - i_borrow;
+        if (i_diff < 0) {
+            i_diff += i_base;
+            i_borrow = 1;
+        } else {
+            i_borrow = 0;
+        }
+        pi_new_table[i] = i_diff;
+    }
+
+    //usuwanie zer i przypisanie
+    int i_final_len = pc_big->i_length;
+    while (i_final_len > 1 && pi_new_table[i_final_len - 1] == 0) {
+        i_final_len--;
+    }
+
+    delete[] c_res.pi_number;
+    c_res.pi_number = pi_new_table;
+    c_res.i_length = i_final_len;
+    c_res.b_isNegative = b_final_negative;
+
+    return c_res;
+}
+
+CNumber CNumber::operator-(int iNewVal) {
+    CNumber c_temp;
+    c_temp = iNewVal;
+
+    return (*this - c_temp);
+}
+
+
 CNumber CNumber::operator*(int iMult) {
     CNumber c_res;
     if (iMult == 0) {
@@ -168,6 +254,23 @@ CNumber CNumber::operator*(int iMult) {
     c_res.b_wasLastOperationSuccessful = true;
 
     return c_res;
+}
+
+bool CNumber::bIsGreaterOrEqual(CNumber &pcOther) {
+    if (this->i_length > pcOther.i_length) {
+        return true;
+    } else if (this->i_length < pcOther.i_length) {
+        return false;
+    } else {
+        for (int i = i_length - 1; i >= 0; i--) {
+            if (pi_number[i] > pcOther.pi_number[i]) {
+                return true;
+            } else if (pi_number[i] < pcOther.pi_number[i]) {
+                return false;
+            }
+        }
+        return true; //sa rowne
+    }
 }
 
 void CNumber::vChangeBase(int iNewBase) {
