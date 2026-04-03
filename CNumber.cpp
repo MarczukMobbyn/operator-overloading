@@ -256,6 +256,59 @@ CNumber CNumber::operator*(int iMult) {
     return c_res;
 }
 
+CNumber CNumber::operator*(CNumber &pcOther) {
+    if (this->i_base != pcOther.i_base) {
+        CNumber c_other_copy = pcOther;
+        c_other_copy.vChangeBase(this->i_base);
+        return (*this * c_other_copy);
+    }
+
+    CNumber c_res(this->i_base);
+    c_res = 0;
+
+    //pobieramy this ale jako wartosc bezwzgledna
+    CNumber c_this_abs = *this;
+    c_this_abs.b_isNegative = false;
+
+    for (int i = 0; i < pcOther.i_length; i++) {
+        if (pcOther.pi_number[i] != 0) {
+
+            CNumber c_step = c_this_abs * pcOther.pi_number[i];
+
+            if (i > 0) {
+                int i_new_len = c_step.i_length + i;
+                int* pi_shifted = new int[i_new_len];
+
+                for (int j = 0; j < i; j++) {
+                    pi_shifted[j] = 0;
+                }
+
+                for (int j = 0; j < c_step.i_length; j++) {
+                    pi_shifted[j + i] = c_step.pi_number[j];
+                }
+
+                delete[] c_step.pi_number;
+                c_step.pi_number = pi_shifted;
+                c_step.i_length = i_new_len;
+            }
+
+            c_res = c_res + c_step;
+        }
+    }
+
+    if (this->bIsNegative() == pcOther.bIsNegative()) {
+        c_res.b_isNegative = false;
+    } else {
+        c_res.b_isNegative = true;
+    }
+
+    if (c_res.i_length == 1 && c_res.pi_number[0] == 0) {
+        c_res.b_isNegative = false;
+    }
+
+    return c_res;
+}
+
 bool CNumber::bIsGreaterOrEqual(CNumber &pcOther) {
     if (this->i_length > pcOther.i_length) {
         return true;
