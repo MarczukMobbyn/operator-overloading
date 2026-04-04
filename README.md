@@ -1,4 +1,6 @@
 PROJECT OVERVIEW
+
+
 This project implements the CNumber class in C++, designed to perform mathematical operations on integers of arbitrary size, limited only by the available system memory. The implementation supports various numeral systems (bases) and ensures robust management of dynamic resources.
 
 KEY FEATURES
