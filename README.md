@@ -1,32 +1,41 @@
-Biblioteka Arytmetyki Dowolnej Precyzji (CNumber)
-Opis projektu:
-Projekt zawiera implementację klasy CNumber w języku C++, która umożliwia wykonywanie operacji matematycznych na liczbach o dowolnej wielkości, ograniczonych jedynie dostępną pamięcią operacyjną. Klasa została zaprojektowana z myślą o obsłudze różnych systemów liczbowych (podstaw) oraz zapewnieniu bezpieczeństwa zarządzania zasobami dynamicznymi.
+PROJECT OVERVIEW
+This project implements the CNumber class in C++, designed to perform mathematical operations on integers of arbitrary size, limited only by the available system memory. The implementation supports various numeral systems (bases) and ensures robust management of dynamic resources.
 
-Główne cechy:
-  Obsługa systemów liczbowych: Klasa umożliwia definiowanie podstawy systemu (np. podstawa 2, 4, 10 itp.) i automatyczną konwersję między nimi podczas operacji.
+KEY FEATURES
 
-  Przeciążanie operatorów: Zaimplementowano pełne wsparcie dla operatorów arytmetycznych (+, -, *, /) oraz operatorów przypisania dla typów int oraz CNumber.
+Multi-Base Support: The class allows for defining a specific base (e.g., base 2 or base 10) and handles automatic base conversion during operations between different CNumber objects.
 
-  Zarządzanie pamięcią: Implementacja wykorzystuje dynamiczne tablice (int* pi_number) do przechowywania cyfr w celu optymalizacji obliczeń.
+Operator Overloading: Provides a natural syntax by overloading standard arithmetic operators (+, -, *, /) and assignment operators for both int and CNumber types.
 
-  Obsługa błędów: Projekt zawiera dedykowany mechanizm wyjątków dla operacji niedozwolonych, takich jak dzielenie przez zero.
+Memory Management: Utilizes dynamic integer arrays to store digits, allowing for flexible scaling of number length.
 
-Szczegóły techniczne:
-  Pamięć i cykle życia: Zgodnie z zasadą "Rule of Three", zaimplementowano destruktor, konstruktor kopiujący oraz operator przypisania, co gwarantuje poprawne wykonywanie głębokich kopii (deep copy) i zapobiega wyciekom pamięci.
+Exception Handling: Includes a custom exception mechanism (DividedByZeroException) to handle illegal operations, such as division by zero.
 
-Algorytmy:
+TECHNICAL DETAILS
 
-  Reprezentacja: Cyfry przechowywane są w kolejności od najmniej znaczącej, co upraszcza implementację algorytmów dodawania i mnożenia.
+Memory and Lifecycle: Adheres to the "Rule of Three" by implementing a destructor, copy constructor, and assignment operator to ensure deep copying and prevent memory leaks.
 
-  Konwersja: Do zmiany podstawy systemu liczbowego wykorzystano algorytm Hornera.
+Algorithmic Approach:
 
-  Dzielenie: Implementacja algorytmu dzielenia pisemnego z obsługą reszty.
+Internal Representation: Digits are stored in reverse order (least significant digit first) to simplify the implementation of arithmetic algorithms.
 
-  Zgodność typów: Metody przyjmują referencje do obiektów, co ogranicza niepotrzebne kopiowanie danych podczas wykonywania operacji złożonych.
+Base Conversion: Employs Horner's method for efficient conversion between different numeral systems.
 
-Struktura plików:
-  CNumber.h / CNumber.cpp: Główna logika klasy, definicje operatorów i algorytmów arytmetycznych.
+Division: Implements a long division algorithm to handle large-scale quotients and remainders.
 
-  DividedByZeroException.h: Definicja klasy wyjątku dziedziczącej po std::exception.
+Efficiency: Methods utilize references for object parameters to minimize unnecessary data copying during complex calculations.
 
-  main.cpp: Przykłady użycia, prezentujące inicjalizację obiektów, operacje arytmetyczne oraz przechwytywanie wyjątków.
+FILE STRUCTURE
+
+CNumber.h / CNumber.cpp: Core class logic, including operator definitions and arithmetic algorithms.
+
+DividedByZeroException.h: Definition of a custom exception class inheriting from std::exception.
+
+main.cpp: Demonstration of usage, showcasing object initialization, arithmetic operations, and exception catching.
+
+IMPLEMENTATION EXAMPLE
+CNumber num1;
+num1 = 100;                   // Assigning from an int
+CNumber num2(2);              // Initializing in binary system
+num2 = 10;
+CNumber result = num1 / num2; // Operations with automatic base synchronization
